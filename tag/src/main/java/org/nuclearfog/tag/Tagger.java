@@ -21,9 +21,9 @@ public abstract class Tagger {
     /**
      * Make a spannable colored String with click listener
      *
-     * @param text String that should be spannable
+     * @param text  String that should be spannable
      * @param color Text Color
-     * @param l click listener
+     * @param l     click listener
      * @return Spannable String
      */
     public static Spannable makeText(final String text, final int color, @NonNull final OnTagClickListener l) {
@@ -55,7 +55,7 @@ public abstract class Tagger {
     /**
      * Make a spannable String without listener
      *
-     * @param text String that should be spannable
+     * @param text  String that should be spannable
      * @param color Text Color
      * @return Spannable String
      */

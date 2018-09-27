@@ -1,2 +1,1 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.nuclearfog.tag" />
+<manifest package="org.nuclearfog.tag" />
