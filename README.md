@@ -1,6 +1,6 @@
 Hashtag-highlighting
 
-- highlight #hashtags and @usernames and makes them clickable
+- highlight #hashtag and @username and makes them clickable
 - customizable color
 - easy to use
 
@@ -15,7 +15,14 @@ implementation 'com.github.NudeDude:Tagger:1.0'
 String text = "#tag test @name test"
 int redColor = 0xffff0000;
 
+// Highlight text
+
 Spannable span = Tagger.makeText(text, redColor);
+
+textView1.setText(span);
+
+
+// Highlight text and add Listener
 
 Spannable spanClick = Tagger.makeText(text, redColor, new Tagger.OnTagClickListener() {
                 @Override
@@ -24,5 +31,5 @@ Spannable spanClick = Tagger.makeText(text, redColor, new Tagger.OnTagClickListe
                 }
             });
             
- textView.setText(spanClick);
+ textView2.setText(spanClick);
 ```
