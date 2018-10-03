@@ -1,14 +1,18 @@
-Hashtag-highlighting
+# Hashtag-highlighting
 
-- highlight #hashtag and @username and makes them clickable
+- highlight #hashtag and @username and make them clickable
 - customizable color
 - easy to use
 
 
 Gradle integration:
 
-implementation 'com.github.NudeDude:Tagger:1.0'
-
+```java
+dependencies {
+  implementation 'com.github.NudeDude:Tagger:1.0'
+  ...
+}
+```
 
 
 ```java
