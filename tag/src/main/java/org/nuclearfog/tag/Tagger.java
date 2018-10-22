@@ -14,9 +14,10 @@ import java.util.regex.Pattern;
 
 public abstract class Tagger {
 
-    private static final String PATTERN = "[@#][^@#\\s\\.\\,\\?\\!]+";
-    private static final int MODE = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
+    private static final String S_CHARS = "\\.\\,\\?\\!\\:\\;\\(\\)\\{\\}\\[\\]\"\'\\+\\-";
+    private static final String PATTERN = "[@#][^@#\\s "+S_CHARS+"]+";
 
+    private static final int MODE = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
     /**
      * Make a spannable colored String with click listener
