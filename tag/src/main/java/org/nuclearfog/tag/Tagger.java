@@ -14,8 +14,9 @@ import java.util.regex.Pattern;
 
 public abstract class Tagger {
 
-    private static final String S_CHARS = "\\.\\,\\?\\!\\:\\;\\(\\)\\{\\}\\[\\]\"\'\\+\\-";
+    private static final String S_CHARS = "\\^\\!\"\\§\\%\\&\\/\\(\\)\\=\\?\\´\\°\\{\\[\\]\\}\\\\\\`\\+\\-\\*\\'\\~\\.\\,\\;\\:\\<\\>\\|";
     private static final String PATTERN = "[@#][^@#\\s "+S_CHARS+"]+";
+    private static final Pattern p = Pattern.compile(PATTERN);
 
     private static final int MODE = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
@@ -29,7 +30,6 @@ public abstract class Tagger {
      */
     public static Spannable makeText(final String text, final int color, @NonNull final OnTagClickListener l) {
         SpannableStringBuilder sText = new SpannableStringBuilder(text);
-        Pattern p = Pattern.compile(PATTERN);
         Matcher m = p.matcher(text);
 
         while (m.find()) {
