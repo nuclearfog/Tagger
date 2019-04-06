@@ -1,5 +1,3 @@
-<p align="center"><img src="/logo/logotype-horizontal.png"></p>
-
 # Hashtag-highlighting
 
 - highlight #hashtag and @username and make them clickable
