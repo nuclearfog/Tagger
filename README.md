@@ -1,21 +1,16 @@
 <p align="center"><img src="/logo/logotype-horizontal.png"></p>
 
-# Hashtag-highlighting
 
 - highlight #hashtag and @username and make them clickable
 - customizable color
-- easy to use
 
 
-Gradle integration:
+Project integration:
 
-```java
-dependencies {
-  implementation 'com.github.NudeDude:Tagger:1.0'
-  ...
-}
-```
+[![](https://jitpack.io/v/NudeDude/Tagger.svg)](https://jitpack.io/#NudeDude/Tagger)
 
+
+Code example:
 
 ```java
 String text = "#tag test @name test"
@@ -39,3 +34,5 @@ Spannable spanClick = Tagger.makeText(text, redColor, new Tagger.OnTagClickListe
             
  textView2.setText(spanClick);
 ```
+
+Logo by <a href="https://github.com/Tobaloidee">@Tobaloidee</a>
