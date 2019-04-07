@@ -1,5 +1,3 @@
-<p align="center"><img src="https://github.com/Tobaloidee/Tagger/blob/master/logo/logomark-horizontal.png"></p>
-
 # Hashtag-highlighting
 
 - highlight #hashtag and @username and make them clickable
