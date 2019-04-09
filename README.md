@@ -7,7 +7,9 @@
 
 Project integration:
 
-[![](https://jitpack.io/v/NudeDude/Tagger.svg)](https://jitpack.io/#NudeDude/Tagger)
+[![](https://jitpack.io/v/nuclearfog/Tagger.svg)](https://jitpack.io/#nuclearfog/Tagger)
+
+
 
 
 Code example:
