@@ -40,15 +40,15 @@ public abstract class Tagger {
     public static Spannable makeText(String text, final int color, @NonNull final OnTagClickListener l) {
         final SpannableStringBuilder sText = new SpannableStringBuilder(text);
         sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
-        Matcher m = TW_PATTERN.matcher(sText);
+        Matcher m = TW_PATTERN.matcher(sText.toString());
 
         while (m.find()) {
-            final int start = m.start();
+            final int start = m.start() + 1;
             final int end = m.end();
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onClick(sText.toString().substring(start, end - 1));
+                    l.onClick(sText.toString().substring(start, end));
                 }
 
                 @Override
@@ -75,7 +75,7 @@ public abstract class Tagger {
     public static Spannable makeTextWithLinks(String text, final int color, @NonNull final OnTagClickListener l) {
         final SpannableStringBuilder sText = new SpannableStringBuilder(makeText(text, color, l));
         sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
-        Matcher m = LINK_PATTERN.matcher(sText);
+        Matcher m = LINK_PATTERN.matcher(sText.toString());
         Stack<Integer> stack = new Stack<>();
 
         while (m.find()) {
@@ -84,8 +84,8 @@ public abstract class Tagger {
         }
         while (!stack.empty()) {
             int end = stack.pop();
-            int start = stack.pop();
-            final String link = sText.toString().substring(start, end - 1);
+            int start = stack.pop() + 1;
+            final String link = sText.toString().substring(start, end);
 
             if (start + MAX_LINK_LENGTH < end) {
                 sText.replace(start + MAX_LINK_LENGTH, end, "...");
@@ -119,10 +119,10 @@ public abstract class Tagger {
     public static Spannable makeText(String text, int color) {
         SpannableStringBuilder sText = new SpannableStringBuilder(text);
         sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
-        Matcher m = TW_PATTERN.matcher(sText);
+        Matcher m = TW_PATTERN.matcher(sText.toString());
 
         while (m.find()) {
-            final int start = m.start();
+            final int start = m.start() + 1;
             final int end = m.end();
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
             sText.setSpan(sColor, start, end, MODE);
@@ -143,7 +143,7 @@ public abstract class Tagger {
     public static Spannable makeTextWithLinks(String text, int color) {
         SpannableStringBuilder sText = new SpannableStringBuilder(makeText(text, color));
         sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
-        Matcher m = LINK_PATTERN.matcher(sText);
+        Matcher m = LINK_PATTERN.matcher(sText.toString());
         Stack<Integer> stack = new Stack<>();
 
         while (m.find()) {
@@ -152,7 +152,7 @@ public abstract class Tagger {
         }
         while (!stack.empty()) {
             int end = stack.pop();
-            int start = stack.pop();
+            int start = stack.pop() + 1;
 
             if (start + MAX_LINK_LENGTH < end) {
                 sText.replace(start + MAX_LINK_LENGTH, end, "...");
