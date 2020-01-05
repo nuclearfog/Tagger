@@ -38,17 +38,18 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeText(String text, final int color, @NonNull final OnTagClickListener l) {
-        final SpannableStringBuilder sText = new SpannableStringBuilder(text);
-        sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
-        Matcher m = TW_PATTERN.matcher(sText.toString());
+        final SpannableStringBuilder sText = new SpannableStringBuilder(" ");
+        sText.append(text);
 
+        /// Add '@' & '#' highlighting + listener
+        Matcher m = TW_PATTERN.matcher(sText.toString());
         while (m.find()) {
-            final int start = m.start() + 1;
-            final int end = m.end();
+            final int start = m.start();
+            final int end = m.end() - 1;
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onClick(sText.toString().substring(start, end));
+                    l.onTagClick(sText.toString().substring(start, end));
                 }
 
                 @Override
@@ -58,7 +59,7 @@ public abstract class Tagger {
                 }
             }, start, end, MODE);
         }
-        sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
+        sText.subSequence(1, sText.length() - 1);
         return sText;
     }
 
@@ -73,28 +74,19 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeTextWithLinks(String text, final int color, @NonNull final OnTagClickListener l) {
-        final SpannableStringBuilder sText = new SpannableStringBuilder(makeText(text, color, l));
-        sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
-        Matcher m = LINK_PATTERN.matcher(sText.toString());
-        Stack<Integer> stack = new Stack<>();
+        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
+        sText.append(text);
 
-        while (m.find()) {
-            stack.push(m.start());
-            stack.push(m.end());
-        }
-        while (!stack.empty()) {
-            int end = stack.pop();
-            int start = stack.pop() + 1;
-            final String link = sText.toString().substring(start, end);
-
-            if (start + MAX_LINK_LENGTH < end) {
-                sText.replace(start + MAX_LINK_LENGTH, end, "...");
-                end = start + MAX_LINK_LENGTH + 3;
-            }
+        /// Add '@' & '#' highlighting + listener
+        Matcher twMatcher = TW_PATTERN.matcher(sText.toString());
+        while (twMatcher.find()) {
+            int start = twMatcher.start();
+            int end = twMatcher.end() - 1;
+            final String twStr = sText.toString().substring(start, end);
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onClick(link);
+                    l.onTagClick(twStr);
                 }
 
                 @Override
@@ -104,7 +96,36 @@ public abstract class Tagger {
                 }
             }, start, end, MODE);
         }
-        sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
+
+        /// Add link highlight + listener
+        Stack<Integer> stack = new Stack<>();
+        Matcher lMatcher = LINK_PATTERN.matcher(sText.toString());
+        while (lMatcher.find()) {
+            stack.push(lMatcher.start());
+            stack.push(lMatcher.end());
+        }
+        while (!stack.empty()) {
+            int end = stack.pop() - 1;
+            int start = stack.pop();
+            final String link = sText.toString().substring(start, end);
+            if (start + MAX_LINK_LENGTH < end) {
+                sText.replace(start + MAX_LINK_LENGTH, end, "...");
+                end = start + MAX_LINK_LENGTH + 3;
+            }
+            sText.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(@NonNull View widget) {
+                    l.onLinkClick(link);
+                }
+
+                @Override
+                public void updateDrawState(@NonNull TextPaint ds) {
+                    ds.setColor(color);
+                    ds.setUnderlineText(false);
+                }
+            }, start, end, MODE);
+        }
+        sText.subSequence(1, sText.length() - 1);
         return sText;
     }
 
@@ -117,17 +138,18 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeText(String text, int color) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(text);
-        sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
-        Matcher m = TW_PATTERN.matcher(sText.toString());
+        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
+        sText.append(text);
 
+        /// Add '@' & '#' highlighting
+        Matcher m = TW_PATTERN.matcher(sText.toString());
         while (m.find()) {
-            final int start = m.start() + 1;
-            final int end = m.end();
+            final int start = m.start();
+            final int end = m.end() - 1;
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
             sText.setSpan(sColor, start, end, MODE);
         }
-        sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
+        sText.subSequence(1, sText.length() - 1); // Remove first whitespace added at the beginning of this method
         return sText;
     }
 
@@ -141,19 +163,28 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeTextWithLinks(String text, int color) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(makeText(text, color));
-        sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
-        Matcher m = LINK_PATTERN.matcher(sText.toString());
-        Stack<Integer> stack = new Stack<>();
+        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
+        sText.append(text);
 
-        while (m.find()) {
-            stack.push(m.start());
-            stack.push(m.end());
+        /// Add '@' & '#' highlighting
+        Matcher twMatcher = TW_PATTERN.matcher(sText.toString());
+        while (twMatcher.find()) {
+            final int start = twMatcher.start();
+            final int end = twMatcher.end() - 1;
+            ForegroundColorSpan sColor = new ForegroundColorSpan(color);
+            sText.setSpan(sColor, start, end, MODE);
+        }
+
+        /// Add link highlighting
+        Stack<Integer> stack = new Stack<>();
+        Matcher lMatcher = LINK_PATTERN.matcher(sText.toString());
+        while (lMatcher.find()) {
+            stack.push(lMatcher.start());
+            stack.push(lMatcher.end());
         }
         while (!stack.empty()) {
-            int end = stack.pop();
-            int start = stack.pop() + 1;
-
+            int end = stack.pop() - 1;
+            int start = stack.pop();
             if (start + MAX_LINK_LENGTH < end) {
                 sText.replace(start + MAX_LINK_LENGTH, end, "...");
                 end = start + MAX_LINK_LENGTH + 3;
@@ -161,7 +192,7 @@ public abstract class Tagger {
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
             sText.setSpan(sColor, start, end, MODE);
         }
-        sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
+        sText.subSequence(1, sText.length() - 1); // Remove first whitespace added at the beginning of this method
         return sText;
     }
 
@@ -173,8 +204,15 @@ public abstract class Tagger {
         /**
          * Called when user clicks on a tag
          *
-         * @param tag Tag string (starting with '@', '#' or http)
+         * @param tag Tag string (starting with '@', '#')
          */
-        void onClick(String tag);
+        void onTagClick(String tag);
+
+        /**
+         * Called when user clicks on link
+         *
+         * @param link http(s) link
+         */
+        void onLinkClick(String link);
     }
 }
