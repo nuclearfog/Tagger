@@ -25,6 +25,7 @@ public abstract class Tagger {
     private static final Pattern LINK_PATTERN = Pattern.compile(LINK_PATTERN_STRING);
     private static final Pattern TW_PATTERN = Pattern.compile(TW_PATTERN_STRING);
     private static final int MODE = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
+    private static final int MAX_LINK_LENGTH = 20;
 
 
     /**
@@ -76,12 +77,17 @@ public abstract class Tagger {
         Matcher m = LINK_PATTERN.matcher(sText);
 
         while (m.find()) {
-            final int start = m.start();
-            final int end = m.end();
+            int start = m.start();
+            int end = m.end();
+            final String link = sText.toString().substring(start, end - 1);
+            if (start + MAX_LINK_LENGTH < end) {
+                sText.replace(start + MAX_LINK_LENGTH, end, "...");
+                end = start + MAX_LINK_LENGTH;
+            }
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onClick(sText.toString().substring(start, end - 1));
+                    l.onClick(link);
                 }
 
                 @Override
@@ -121,7 +127,7 @@ public abstract class Tagger {
 
     /**
      * Make a spannable String without listener
-     * http(s) links included
+     * http(s) links included will be shorted
      *
      * @param text  String that should be spannable
      * @param color Text Color
@@ -133,8 +139,12 @@ public abstract class Tagger {
         Matcher m = LINK_PATTERN.matcher(sText);
 
         while (m.find()) {
-            final int start = m.start();
-            final int end = m.end();
+            int start = m.start();
+            int end = m.end();
+            if (start + MAX_LINK_LENGTH < end) {
+                sText.replace(start + MAX_LINK_LENGTH, end, "...");
+                end = start + MAX_LINK_LENGTH;
+            }
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
             sText.setSpan(sColor, start, end, MODE);
         }
