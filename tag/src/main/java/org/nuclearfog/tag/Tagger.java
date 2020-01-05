@@ -12,6 +12,12 @@ import android.view.View;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This class includes utilities to create  {@link Spannable} strings for TextViews
+ * every word starting with '@', '#' or http(s) links will be highlighted
+ *
+ * @author nuclearfog
+ */
 public abstract class Tagger {
 
     private static final String LINK_PATTERN_STRING = "[\n\\s]https?://[^\\s]+";
@@ -36,7 +42,7 @@ public abstract class Tagger {
 
         while (m.find()) {
             final int start = m.start();
-            final int end = m.end();
+            final int end = m.end() - 1;
 
             sText.setSpan(new ClickableSpan() {
                 @Override
@@ -72,7 +78,7 @@ public abstract class Tagger {
 
         while (m.find()) {
             final int start = m.start();
-            final int end = m.end();
+            final int end = m.end() - 1;
 
             sText.setSpan(new ClickableSpan() {
                 @Override
@@ -105,8 +111,10 @@ public abstract class Tagger {
         Matcher m = TW_PATTERN.matcher(sText);
 
         while (m.find()) {
+            final int start = m.start();
+            final int end = m.end() - 1;
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
-            sText.setSpan(sColor, m.start(), m.end(), MODE);
+            sText.setSpan(sColor, start, end, MODE);
         }
         sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
         return sText;
@@ -127,8 +135,10 @@ public abstract class Tagger {
         Matcher m = LINK_PATTERN.matcher(sText);
 
         while (m.find()) {
+            final int start = m.start();
+            final int end = m.end() - 1;
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
-            sText.setSpan(sColor, m.start(), m.end(), MODE);
+            sText.setSpan(sColor, start, end, MODE);
         }
         sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
         return sText;
@@ -136,13 +146,13 @@ public abstract class Tagger {
 
 
     /**
-     * Interface definition of Tag click listener
+     * Listener for clickable spans
      */
     public interface OnTagClickListener {
         /**
-         * Called on tag click
+         * Called when user clicks on a tag
          *
-         * @param tag Clicked Tag
+         * @param tag Tag string (starting with '@', '#' or http)
          */
         void onClick(String tag);
     }
