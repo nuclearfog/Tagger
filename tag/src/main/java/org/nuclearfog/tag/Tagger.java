@@ -64,7 +64,7 @@ public abstract class Tagger {
                 }, start, end, MODE);
             }
         }
-        return sText.delete(0, sText.length() - 1); // Remove first whitespace added at the beginning of this method
+        return sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
     }
 
 
@@ -131,7 +131,7 @@ public abstract class Tagger {
                 }, start, end, MODE);
             }
         }
-        return sText.delete(0, sText.length() - 1); // Remove first whitespace added at the beginning of this method
+        return sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
     }
 
 
@@ -156,7 +156,7 @@ public abstract class Tagger {
                 sText.setSpan(sColor, start, end, MODE);
             }
         }
-        return sText.delete(0, sText.length() - 1); // Remove first whitespace added at the beginning of this method
+        return sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
     }
 
 
@@ -199,7 +199,7 @@ public abstract class Tagger {
                 sText.setSpan(sColor, start, end, MODE);
             }
         }
-        return sText.delete(0, sText.length() - 1);
+        return sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
     }
 
 
