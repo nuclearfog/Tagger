@@ -38,18 +38,18 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeText(String text, final int color, @NonNull final OnTagClickListener l) {
-        final SpannableStringBuilder sText = new SpannableStringBuilder(" ");
-        sText.append(text);
+        SpannableStringBuilder sText = new SpannableStringBuilder(" " + text);
 
         /// Add '@' & '#' highlighting + listener
-        Matcher m = TW_PATTERN.matcher(sText.toString());
+        Matcher m = TW_PATTERN.matcher(sText);
         while (m.find()) {
-            final int start = m.start();
-            final int end = m.end() - 1;
+            int end = m.end();
+            int start = m.start() + 1;
+            final CharSequence tag = sText.subSequence(start, end);
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onTagClick(sText.toString().substring(start, end));
+                    l.onTagClick(tag.toString());
                 }
 
                 @Override
@@ -78,15 +78,15 @@ public abstract class Tagger {
         sText.append(text);
 
         /// Add '@' & '#' highlighting + listener
-        Matcher twMatcher = TW_PATTERN.matcher(sText.toString());
+        Matcher twMatcher = TW_PATTERN.matcher(sText);
         while (twMatcher.find()) {
-            int start = twMatcher.start();
-            int end = twMatcher.end() - 1;
-            final String twStr = sText.toString().substring(start, end);
+            int end = twMatcher.end();
+            int start = twMatcher.start() + 1;
+            final CharSequence twStr = sText.subSequence(start, end);
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onTagClick(twStr);
+                    l.onTagClick(twStr.toString());
                 }
 
                 @Override
@@ -105,9 +105,9 @@ public abstract class Tagger {
             stack.push(lMatcher.end());
         }
         while (!stack.empty()) {
-            int end = stack.pop() - 1;
-            int start = stack.pop();
-            final String link = sText.toString().substring(start, end);
+            int end = stack.pop();
+            int start = stack.pop() + 1;
+            final CharSequence link = sText.subSequence(start, end);
             if (start + MAX_LINK_LENGTH < end) {
                 sText.replace(start + MAX_LINK_LENGTH, end, "...");
                 end = start + MAX_LINK_LENGTH + 3;
@@ -115,7 +115,7 @@ public abstract class Tagger {
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onLinkClick(link);
+                    l.onLinkClick(link.toString());
                 }
 
                 @Override
@@ -144,8 +144,8 @@ public abstract class Tagger {
         /// Add '@' & '#' highlighting
         Matcher m = TW_PATTERN.matcher(sText.toString());
         while (m.find()) {
-            final int start = m.start();
-            final int end = m.end() - 1;
+            int end = m.end();
+            int start = m.start() + 1;
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
             sText.setSpan(sColor, start, end, MODE);
         }
@@ -169,8 +169,8 @@ public abstract class Tagger {
         /// Add '@' & '#' highlighting
         Matcher twMatcher = TW_PATTERN.matcher(sText.toString());
         while (twMatcher.find()) {
-            final int start = twMatcher.start();
-            final int end = twMatcher.end() - 1;
+            int end = twMatcher.end();
+            int start = twMatcher.start() + 1;
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
             sText.setSpan(sColor, start, end, MODE);
         }
@@ -183,8 +183,8 @@ public abstract class Tagger {
             stack.push(lMatcher.end());
         }
         while (!stack.empty()) {
-            int end = stack.pop() - 1;
-            int start = stack.pop();
+            int end = stack.pop();
+            int start = stack.pop() + 1;
             if (start + MAX_LINK_LENGTH < end) {
                 sText.replace(start + MAX_LINK_LENGTH, end, "...");
                 end = start + MAX_LINK_LENGTH + 3;
