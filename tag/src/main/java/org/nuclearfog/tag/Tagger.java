@@ -29,8 +29,8 @@ public abstract class Tagger {
      * @param l     click listener
      * @return Spannable String
      */
-    public static Spannable makeText(final String text, final int color, @NonNull final OnTagClickListener l) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(text);
+    public static Spannable makeText(String text, final int color, @NonNull final OnTagClickListener l) {
+        final SpannableStringBuilder sText = new SpannableStringBuilder(text);
         sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
         Matcher m = TW_PATTERN.matcher(sText);
 
@@ -41,7 +41,7 @@ public abstract class Tagger {
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onClick(text.substring(start, end));
+                    l.onClick(sText.toString().substring(start, end));
                 }
 
                 @Override
@@ -65,8 +65,8 @@ public abstract class Tagger {
      * @param l     click listener
      * @return Spannable String
      */
-    public static Spannable makeTextWithLinks(final String text, final int color, @NonNull final OnTagClickListener l) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(makeText(text, color, l));
+    public static Spannable makeTextWithLinks(String text, final int color, @NonNull final OnTagClickListener l) {
+        final SpannableStringBuilder sText = new SpannableStringBuilder(makeText(text, color, l));
         sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
         Matcher m = LINK_PATTERN.matcher(sText);
 
@@ -77,7 +77,7 @@ public abstract class Tagger {
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onClick(text.substring(start, end));
+                    l.onClick(sText.toString().substring(start, end));
                 }
 
                 @Override
