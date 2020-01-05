@@ -18,8 +18,8 @@ public abstract class Tagger {
     private static final String TW_PATTERN_STRING = "[\n\\s][@#][^@#\\s\\^\\!\"\\§\\%\\&\\/\\(\\)\\=\\?\\´\\°\\{\\[\\]\\}\\\\\\`\\+\\-\\*\\'\\~\\.\\,\\;\\:\\<\\>\\|]+";
     private static final Pattern LINK_PATTERN = Pattern.compile(LINK_PATTERN_STRING);
     private static final Pattern TW_PATTERN = Pattern.compile(TW_PATTERN_STRING);
-
     private static final int MODE = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
+
 
     /**
      * Make a spannable colored String with click listener
@@ -55,6 +55,16 @@ public abstract class Tagger {
         return sText;
     }
 
+
+    /**
+     * Make a spannable colored String with click listener
+     * http(s) links included
+     *
+     * @param text  String that should be spannable
+     * @param color Text Color
+     * @param l     click listener
+     * @return Spannable String
+     */
     public static Spannable makeTextWithLinks(final String text, final int color, @NonNull final OnTagClickListener l) {
         SpannableStringBuilder sText = new SpannableStringBuilder(makeText(text, color, l));
         sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
@@ -95,11 +105,30 @@ public abstract class Tagger {
         Matcher m = TW_PATTERN.matcher(sText);
 
         while (m.find()) {
-            final int start = m.start();
-            final int end = m.end();
-
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
-            sText.setSpan(sColor, start, end, MODE);
+            sText.setSpan(sColor, m.start(), m.end(), MODE);
+        }
+        sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
+        return sText;
+    }
+
+
+    /**
+     * Make a spannable String without listener
+     * http(s) links included
+     *
+     * @param text  String that should be spannable
+     * @param color Text Color
+     * @return Spannable String
+     */
+    public static Spannable makeTextWithLinks(String text, int color) {
+        SpannableStringBuilder sText = new SpannableStringBuilder(makeText(text, color));
+        sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
+        Matcher m = LINK_PATTERN.matcher(sText);
+
+        while (m.find()) {
+            ForegroundColorSpan sColor = new ForegroundColorSpan(color);
+            sText.setSpan(sColor, m.start(), m.end(), MODE);
         }
         sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
         return sText;
