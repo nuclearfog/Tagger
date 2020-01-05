@@ -25,7 +25,7 @@ public abstract class Tagger {
     private static final Pattern LINK_PATTERN = Pattern.compile(LINK_PATTERN_STRING);
     private static final Pattern TW_PATTERN = Pattern.compile(TW_PATTERN_STRING);
     private static final int MODE = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
-    private static final int MAX_LINK_LENGTH = 20;
+    private static final int MAX_LINK_LENGTH = 30;
 
 
     /**
@@ -75,14 +75,15 @@ public abstract class Tagger {
         final SpannableStringBuilder sText = new SpannableStringBuilder(makeText(text, color, l));
         sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
         Matcher m = LINK_PATTERN.matcher(sText);
+        int end = 0;
 
-        while (m.find()) {
+        while (m.find(end)) {
             int start = m.start();
-            int end = m.end();
+            end = m.end();
             final String link = sText.toString().substring(start, end - 1);
             if (start + MAX_LINK_LENGTH < end) {
                 sText.replace(start + MAX_LINK_LENGTH, end, "...");
-                end = start + MAX_LINK_LENGTH;
+                end = start + MAX_LINK_LENGTH + 3;
             }
             sText.setSpan(new ClickableSpan() {
                 @Override
@@ -137,13 +138,14 @@ public abstract class Tagger {
         SpannableStringBuilder sText = new SpannableStringBuilder(makeText(text, color));
         sText.insert(0, " "); // Add whitespace at begin to match if target string is at beginning
         Matcher m = LINK_PATTERN.matcher(sText);
+        int end = 0;
 
-        while (m.find()) {
+        while (m.find(end)) {
             int start = m.start();
-            int end = m.end();
+            end = m.end();
             if (start + MAX_LINK_LENGTH < end) {
                 sText.replace(start + MAX_LINK_LENGTH, end, "...");
-                end = start + MAX_LINK_LENGTH;
+                end = start + MAX_LINK_LENGTH + 3;
             }
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
             sText.setSpan(sColor, start, end, MODE);
