@@ -74,8 +74,7 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeTextWithLinks(String text, final int color, @NonNull final OnTagClickListener l) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
-        sText.append(text);
+        SpannableStringBuilder sText = new SpannableStringBuilder(" " + text);
 
         /// Add '@' & '#' highlighting + listener
         Matcher twMatcher = TW_PATTERN.matcher(sText);
@@ -138,8 +137,7 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeText(String text, int color) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
-        sText.append(text);
+        SpannableStringBuilder sText = new SpannableStringBuilder(" " + text);
 
         /// Add '@' & '#' highlighting
         Matcher m = TW_PATTERN.matcher(sText.toString());
@@ -163,8 +161,7 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeTextWithLinks(String text, int color) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
-        sText.append(text);
+        SpannableStringBuilder sText = new SpannableStringBuilder(" " + text);
 
         /// Add '@' & '#' highlighting
         Matcher twMatcher = TW_PATTERN.matcher(sText.toString());
