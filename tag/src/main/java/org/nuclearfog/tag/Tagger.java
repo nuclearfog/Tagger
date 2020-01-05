@@ -63,9 +63,8 @@ public abstract class Tagger {
                     }
                 }, start, end, MODE);
             }
-            sText.subSequence(1, sText.length() - 1);
         }
-        return sText;
+        return sText.delete(0, sText.length() - 1); // Remove first whitespace added at the beginning of this method
     }
 
 
@@ -131,9 +130,8 @@ public abstract class Tagger {
                     }
                 }, start, end, MODE);
             }
-            sText.subSequence(1, sText.length() - 1);
         }
-        return sText;
+        return sText.delete(0, sText.length() - 1); // Remove first whitespace added at the beginning of this method
     }
 
 
@@ -157,9 +155,8 @@ public abstract class Tagger {
                 ForegroundColorSpan sColor = new ForegroundColorSpan(color);
                 sText.setSpan(sColor, start, end, MODE);
             }
-            sText.subSequence(1, sText.length() - 1); // Remove first whitespace added at the beginning of this method
         }
-        return sText;
+        return sText.delete(0, sText.length() - 1); // Remove first whitespace added at the beginning of this method
     }
 
 
@@ -173,7 +170,6 @@ public abstract class Tagger {
      */
     public static Spannable makeTextWithLinks(@Nullable String text, int color) {
         SpannableStringBuilder sText = new SpannableStringBuilder(" ");
-
         /// Add '@' & '#' highlighting
         if (text != null && text.length() > 0) {
             sText.append(text);
@@ -202,9 +198,8 @@ public abstract class Tagger {
                 ForegroundColorSpan sColor = new ForegroundColorSpan(color);
                 sText.setSpan(sColor, start, end, MODE);
             }
-            sText.subSequence(1, sText.length() - 1); // Remove first whitespace added at the beginning of this method
         }
-        return sText;
+        return sText.delete(0, sText.length() - 1);
     }
 
 
