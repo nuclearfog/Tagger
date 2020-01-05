@@ -38,28 +38,31 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeText(String text, final int color, @NonNull final OnTagClickListener l) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" " + text);
+        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
 
         /// Add '@' & '#' highlighting + listener
-        Matcher m = TW_PATTERN.matcher(sText);
-        while (m.find()) {
-            int end = m.end();
-            int start = m.start() + 1;
-            final CharSequence tag = sText.subSequence(start, end);
-            sText.setSpan(new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    l.onTagClick(tag.toString());
-                }
+        if (text != null && text.length() != 0) {
+            sText.append(text);
+            Matcher m = TW_PATTERN.matcher(sText);
+            while (m.find()) {
+                int end = m.end();
+                int start = m.start() + 1;
+                final CharSequence tag = sText.subSequence(start, end);
+                sText.setSpan(new ClickableSpan() {
+                    @Override
+                    public void onClick(@NonNull View widget) {
+                        l.onTagClick(tag.toString());
+                    }
 
-                @Override
-                public void updateDrawState(@NonNull TextPaint ds) {
-                    ds.setColor(color);
-                    ds.setUnderlineText(false);
-                }
-            }, start, end, MODE);
+                    @Override
+                    public void updateDrawState(@NonNull TextPaint ds) {
+                        ds.setColor(color);
+                        ds.setUnderlineText(false);
+                    }
+                }, start, end, MODE);
+            }
+            sText.subSequence(1, sText.length() - 1);
         }
-        sText.subSequence(1, sText.length() - 1);
         return sText;
     }
 
@@ -74,57 +77,60 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeTextWithLinks(String text, final int color, @NonNull final OnTagClickListener l) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" " + text);
+        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
 
         /// Add '@' & '#' highlighting + listener
-        Matcher twMatcher = TW_PATTERN.matcher(sText);
-        while (twMatcher.find()) {
-            int end = twMatcher.end();
-            int start = twMatcher.start() + 1;
-            final CharSequence twStr = sText.subSequence(start, end);
-            sText.setSpan(new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    l.onTagClick(twStr.toString());
-                }
+        if (text != null && text.length() != 0) {
+            sText.append(text);
+            Matcher twMatcher = TW_PATTERN.matcher(sText);
+            while (twMatcher.find()) {
+                int end = twMatcher.end();
+                int start = twMatcher.start() + 1;
+                final CharSequence twStr = sText.subSequence(start, end);
+                sText.setSpan(new ClickableSpan() {
+                    @Override
+                    public void onClick(@NonNull View widget) {
+                        l.onTagClick(twStr.toString());
+                    }
 
-                @Override
-                public void updateDrawState(@NonNull TextPaint ds) {
-                    ds.setColor(color);
-                    ds.setUnderlineText(false);
-                }
-            }, start, end, MODE);
-        }
-
-        /// Add link highlight + listener
-        Stack<Integer> stack = new Stack<>();
-        Matcher lMatcher = LINK_PATTERN.matcher(sText.toString());
-        while (lMatcher.find()) {
-            stack.push(lMatcher.start());
-            stack.push(lMatcher.end());
-        }
-        while (!stack.empty()) {
-            int end = stack.pop();
-            int start = stack.pop() + 1;
-            final CharSequence link = sText.subSequence(start, end);
-            if (start + MAX_LINK_LENGTH < end) {
-                sText.replace(start + MAX_LINK_LENGTH, end, "...");
-                end = start + MAX_LINK_LENGTH + 3;
+                    @Override
+                    public void updateDrawState(@NonNull TextPaint ds) {
+                        ds.setColor(color);
+                        ds.setUnderlineText(false);
+                    }
+                }, start, end, MODE);
             }
-            sText.setSpan(new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    l.onLinkClick(link.toString());
-                }
 
-                @Override
-                public void updateDrawState(@NonNull TextPaint ds) {
-                    ds.setColor(color);
-                    ds.setUnderlineText(false);
+            /// Add link highlight + listener
+            Stack<Integer> stack = new Stack<>();
+            Matcher lMatcher = LINK_PATTERN.matcher(sText.toString());
+            while (lMatcher.find()) {
+                stack.push(lMatcher.start());
+                stack.push(lMatcher.end());
+            }
+            while (!stack.empty()) {
+                int end = stack.pop();
+                int start = stack.pop() + 1;
+                final CharSequence link = sText.subSequence(start, end);
+                if (start + MAX_LINK_LENGTH < end) {
+                    sText.replace(start + MAX_LINK_LENGTH, end, "...");
+                    end = start + MAX_LINK_LENGTH + 3;
                 }
-            }, start, end, MODE);
+                sText.setSpan(new ClickableSpan() {
+                    @Override
+                    public void onClick(@NonNull View widget) {
+                        l.onLinkClick(link.toString());
+                    }
+
+                    @Override
+                    public void updateDrawState(@NonNull TextPaint ds) {
+                        ds.setColor(color);
+                        ds.setUnderlineText(false);
+                    }
+                }, start, end, MODE);
+            }
+            sText.subSequence(1, sText.length() - 1);
         }
-        sText.subSequence(1, sText.length() - 1);
         return sText;
     }
 
@@ -137,17 +143,20 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeText(String text, int color) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" " + text);
+        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
 
         /// Add '@' & '#' highlighting
-        Matcher m = TW_PATTERN.matcher(sText.toString());
-        while (m.find()) {
-            int end = m.end();
-            int start = m.start() + 1;
-            ForegroundColorSpan sColor = new ForegroundColorSpan(color);
-            sText.setSpan(sColor, start, end, MODE);
+        if (text != null && text.length() != 0) {
+            sText.append(text);
+            Matcher m = TW_PATTERN.matcher(sText.toString());
+            while (m.find()) {
+                int end = m.end();
+                int start = m.start() + 1;
+                ForegroundColorSpan sColor = new ForegroundColorSpan(color);
+                sText.setSpan(sColor, start, end, MODE);
+            }
+            sText.subSequence(1, sText.length() - 1); // Remove first whitespace added at the beginning of this method
         }
-        sText.subSequence(1, sText.length() - 1); // Remove first whitespace added at the beginning of this method
         return sText;
     }
 
@@ -164,32 +173,35 @@ public abstract class Tagger {
         SpannableStringBuilder sText = new SpannableStringBuilder(" " + text);
 
         /// Add '@' & '#' highlighting
-        Matcher twMatcher = TW_PATTERN.matcher(sText.toString());
-        while (twMatcher.find()) {
-            int end = twMatcher.end();
-            int start = twMatcher.start() + 1;
-            ForegroundColorSpan sColor = new ForegroundColorSpan(color);
-            sText.setSpan(sColor, start, end, MODE);
-        }
-
-        /// Add link highlighting
-        Stack<Integer> stack = new Stack<>();
-        Matcher lMatcher = LINK_PATTERN.matcher(sText.toString());
-        while (lMatcher.find()) {
-            stack.push(lMatcher.start());
-            stack.push(lMatcher.end());
-        }
-        while (!stack.empty()) {
-            int end = stack.pop();
-            int start = stack.pop() + 1;
-            if (start + MAX_LINK_LENGTH < end) {
-                sText.replace(start + MAX_LINK_LENGTH, end, "...");
-                end = start + MAX_LINK_LENGTH + 3;
+        if (text != null && text.length() != 0) {
+            sText.append(text);
+            Matcher twMatcher = TW_PATTERN.matcher(sText.toString());
+            while (twMatcher.find()) {
+                int end = twMatcher.end();
+                int start = twMatcher.start() + 1;
+                ForegroundColorSpan sColor = new ForegroundColorSpan(color);
+                sText.setSpan(sColor, start, end, MODE);
             }
-            ForegroundColorSpan sColor = new ForegroundColorSpan(color);
-            sText.setSpan(sColor, start, end, MODE);
+
+            /// Add link highlighting
+            Stack<Integer> stack = new Stack<>();
+            Matcher lMatcher = LINK_PATTERN.matcher(sText.toString());
+            while (lMatcher.find()) {
+                stack.push(lMatcher.start());
+                stack.push(lMatcher.end());
+            }
+            while (!stack.empty()) {
+                int end = stack.pop();
+                int start = stack.pop() + 1;
+                if (start + MAX_LINK_LENGTH < end) {
+                    sText.replace(start + MAX_LINK_LENGTH, end, "...");
+                    end = start + MAX_LINK_LENGTH + 3;
+                }
+                ForegroundColorSpan sColor = new ForegroundColorSpan(color);
+                sText.setSpan(sColor, start, end, MODE);
+            }
+            sText.subSequence(1, sText.length() - 1); // Remove first whitespace added at the beginning of this method
         }
-        sText.subSequence(1, sText.length() - 1); // Remove first whitespace added at the beginning of this method
         return sText;
     }
 
