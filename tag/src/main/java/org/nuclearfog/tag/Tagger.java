@@ -1,6 +1,7 @@
 package org.nuclearfog.tag;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
  * every word starting with '@', '#' or http(s) links will be highlighted
  *
  * @author nuclearfog
+ * @version 2.0
  */
 public abstract class Tagger {
 
@@ -37,11 +39,11 @@ public abstract class Tagger {
      * @param l     click listener
      * @return Spannable String
      */
-    public static Spannable makeText(String text, final int color, @NonNull final OnTagClickListener l) {
+    public static Spannable makeText(@Nullable String text, final int color, @NonNull final OnTagClickListener l) {
         SpannableStringBuilder sText = new SpannableStringBuilder(" ");
 
         /// Add '@' & '#' highlighting + listener
-        if (text != null && text.length() != 0) {
+        if (text != null && text.length() > 0) {
             sText.append(text);
             Matcher m = TW_PATTERN.matcher(sText);
             while (m.find()) {
@@ -76,11 +78,11 @@ public abstract class Tagger {
      * @param l     click listener
      * @return Spannable String
      */
-    public static Spannable makeTextWithLinks(String text, final int color, @NonNull final OnTagClickListener l) {
+    public static Spannable makeTextWithLinks(@Nullable String text, final int color, @NonNull final OnTagClickListener l) {
         SpannableStringBuilder sText = new SpannableStringBuilder(" ");
 
         /// Add '@' & '#' highlighting + listener
-        if (text != null && text.length() != 0) {
+        if (text != null && text.length() > 0) {
             sText.append(text);
             Matcher twMatcher = TW_PATTERN.matcher(sText);
             while (twMatcher.find()) {
@@ -142,11 +144,11 @@ public abstract class Tagger {
      * @param color Text Color
      * @return Spannable String
      */
-    public static Spannable makeText(String text, int color) {
+    public static Spannable makeText(@Nullable String text, int color) {
         SpannableStringBuilder sText = new SpannableStringBuilder(" ");
 
         /// Add '@' & '#' highlighting
-        if (text != null && text.length() != 0) {
+        if (text != null && text.length() > 0) {
             sText.append(text);
             Matcher m = TW_PATTERN.matcher(sText.toString());
             while (m.find()) {
@@ -169,11 +171,11 @@ public abstract class Tagger {
      * @param color Text Color
      * @return Spannable String
      */
-    public static Spannable makeTextWithLinks(String text, int color) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" " + text);
+    public static Spannable makeTextWithLinks(@Nullable String text, int color) {
+        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
 
         /// Add '@' & '#' highlighting
-        if (text != null && text.length() != 0) {
+        if (text != null && text.length() > 0) {
             sText.append(text);
             Matcher twMatcher = TW_PATTERN.matcher(sText.toString());
             while (twMatcher.find()) {
