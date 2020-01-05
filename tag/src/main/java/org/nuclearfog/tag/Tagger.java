@@ -42,12 +42,11 @@ public abstract class Tagger {
 
         while (m.find()) {
             final int start = m.start();
-            final int end = m.end() - 1;
-
+            final int end = m.end();
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onClick(sText.toString().substring(start, end));
+                    l.onClick(sText.toString().substring(start, end - 1));
                 }
 
                 @Override
@@ -78,12 +77,11 @@ public abstract class Tagger {
 
         while (m.find()) {
             final int start = m.start();
-            final int end = m.end() - 1;
-
+            final int end = m.end();
             sText.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    l.onClick(sText.toString().substring(start, end));
+                    l.onClick(sText.toString().substring(start, end - 1));
                 }
 
                 @Override
@@ -112,7 +110,7 @@ public abstract class Tagger {
 
         while (m.find()) {
             final int start = m.start();
-            final int end = m.end() - 1;
+            final int end = m.end();
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
             sText.setSpan(sColor, start, end, MODE);
         }
@@ -136,7 +134,7 @@ public abstract class Tagger {
 
         while (m.find()) {
             final int start = m.start();
-            final int end = m.end() - 1;
+            final int end = m.end();
             ForegroundColorSpan sColor = new ForegroundColorSpan(color);
             sText.setSpan(sColor, start, end, MODE);
         }
