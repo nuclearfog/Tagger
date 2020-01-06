@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public abstract class Tagger {
 
     private static final String LINK_PATTERN_STRING = "[\n\\s]https?://[^\\s]+";
-    private static final String TW_PATTERN_STRING = "[\n\\s][@#][^@#\\s\\^\\!\"\\§\\%\\&\\/\\(\\)\\=\\?\\´\\°\\{\\[\\]\\}\\\\\\`\\+\\-\\*\\'\\~\\.\\,\\;\\:\\<\\>\\|]+";
+    private static final String TW_PATTERN_STRING = "[\n\\s\\[\\]{}().,;:][@#][^@#\\s^!\"§%&/()=?´°{\\[\\]}\\\\`+\\-*'~.,;:<>|]+";
     private static final Pattern LINK_PATTERN = Pattern.compile(LINK_PATTERN_STRING);
     private static final Pattern TW_PATTERN = Pattern.compile(TW_PATTERN_STRING);
     private static final int MODE = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
