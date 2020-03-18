@@ -110,7 +110,13 @@ public abstract class Tagger {
                 int end = stack.pop();
                 int start = stack.pop();
                 final String link = sText.subSequence(start, end).toString();
-                start += link.startsWith("https://") ? 8 : 7;
+                if (link.startsWith("https://")) {
+                    sText.delete(start, start + 8);
+                    end -= 8;
+                } else {
+                    sText.delete(start, start + 7);
+                    end -= 7;
+                }
                 if (start + MAX_LINK_LENGTH < end) {
                     sText.replace(start + MAX_LINK_LENGTH, end, "...");
                     end = start + MAX_LINK_LENGTH + 3;
@@ -188,7 +194,13 @@ public abstract class Tagger {
                 int end = stack.pop();
                 int start = stack.pop();
                 final String link = sText.subSequence(start, end).toString();
-                start += link.startsWith("https://") ? 8 : 7;
+                if (link.startsWith("https://")) {
+                    sText.delete(start, start + 8);
+                    end -= 8;
+                } else {
+                    sText.delete(start, start + 7);
+                    end -= 7;
+                }
                 if (start + MAX_LINK_LENGTH < end) {
                     sText.replace(start + MAX_LINK_LENGTH, end, "...");
                     end = start + MAX_LINK_LENGTH + 3;
