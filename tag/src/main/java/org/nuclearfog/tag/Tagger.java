@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  */
 public abstract class Tagger {
 
-    private static final String HTTP_PATTERN_STRING = "http://\\S+";
+    private static final String HTTP_PATTERN_STRING = "https?://\\S+";
     private static final String TW_PATTERN_STRING = "[@#][^@#`*'~.,;:<>|^!/\"§%&()=?´°{}+\\-\\[\\]\\s]+";
     private static final Pattern HTTP_PATTERN = Pattern.compile(HTTP_PATTERN_STRING);
     private static final Pattern TW_PATTERN = Pattern.compile(TW_PATTERN_STRING);
@@ -111,10 +111,10 @@ public abstract class Tagger {
                 int start = stack.pop();
                 final String link = sText.subSequence(start, end).toString();
                 if (link.startsWith("https://")) {
-                    sText.delete(start, start + 8);
+                    sText = sText.delete(start, start + 8);
                     end -= 8;
                 } else {
-                    sText.delete(start, start + 7);
+                    sText = sText.delete(start, start + 7);
                     end -= 7;
                 }
                 if (start + MAX_LINK_LENGTH < end) {
@@ -195,10 +195,10 @@ public abstract class Tagger {
                 int start = stack.pop();
                 final String link = sText.subSequence(start, end).toString();
                 if (link.startsWith("https://")) {
-                    sText.delete(start, start + 8);
+                    sText = sText.delete(start, start + 8);
                     end -= 8;
                 } else {
-                    sText.delete(start, start + 7);
+                    sText = sText.delete(start, start + 7);
                     end -= 7;
                 }
                 if (start + MAX_LINK_LENGTH < end) {
