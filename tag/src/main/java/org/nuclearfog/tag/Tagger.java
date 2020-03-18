@@ -19,12 +19,12 @@ import java.util.regex.Pattern;
  * every word starting with '@', '#' or http(s) links will be highlighted
  *
  * @author nuclearfog
- * @version 2.0
+ * @version 2.1
  */
 public abstract class Tagger {
 
-    private static final String LINK_PATTERN_STRING = "[\\s]https?://\\S+";
-    private static final String TW_PATTERN_STRING = "[\\s\\[\\]{}().,;:][@#][^@#`*'~.,;:<>|^!/\"§%&()=?´°{}+\\-\\[\\]\\s]+";
+    private static final String LINK_PATTERN_STRING = "https://\\S+";
+    private static final String TW_PATTERN_STRING = "[@#][^@#`*'~.,;:<>|^!/\"§%&()=?´°{}+\\-\\[\\]\\s]+";
     private static final Pattern LINK_PATTERN = Pattern.compile(LINK_PATTERN_STRING);
     private static final Pattern TW_PATTERN = Pattern.compile(TW_PATTERN_STRING);
     private static final int MODE = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
@@ -40,8 +40,7 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeText(@Nullable String text, final int color, @NonNull final OnTagClickListener l) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
-
+        SpannableStringBuilder sText = new SpannableStringBuilder();
         /// Add '@' & '#' highlighting + listener
         if (text != null && text.length() > 0) {
             sText.append(text);
@@ -64,7 +63,7 @@ public abstract class Tagger {
                 }, start, end, MODE);
             }
         }
-        return sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
+        return sText;
     }
 
 
@@ -78,8 +77,7 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeTextWithLinks(@Nullable String text, final int color, @NonNull final OnTagClickListener l) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
-
+        SpannableStringBuilder sText = new SpannableStringBuilder();
         /// Add '@' & '#' highlighting + listener
         if (text != null && text.length() > 0) {
             sText.append(text);
@@ -101,7 +99,6 @@ public abstract class Tagger {
                     }
                 }, start, end, MODE);
             }
-
             /// Add link highlight + listener
             Stack<Integer> stack = new Stack<>();
             Matcher lMatcher = LINK_PATTERN.matcher(sText.toString());
@@ -111,7 +108,7 @@ public abstract class Tagger {
             }
             while (!stack.empty()) {
                 int end = stack.pop();
-                int start = stack.pop() + 1;
+                int start = stack.pop() + 9;
                 final CharSequence link = sText.subSequence(start, end);
                 if (start + MAX_LINK_LENGTH < end) {
                     sText.replace(start + MAX_LINK_LENGTH, end, "...");
@@ -131,7 +128,7 @@ public abstract class Tagger {
                 }, start, end, MODE);
             }
         }
-        return sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
+        return sText;
     }
 
 
@@ -143,8 +140,7 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeText(@Nullable String text, int color) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
-
+        SpannableStringBuilder sText = new SpannableStringBuilder();
         /// Add '@' & '#' highlighting
         if (text != null && text.length() > 0) {
             sText.append(text);
@@ -156,7 +152,7 @@ public abstract class Tagger {
                 sText.setSpan(sColor, start, end, MODE);
             }
         }
-        return sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
+        return sText;
     }
 
 
@@ -169,7 +165,7 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeTextWithLinks(@Nullable String text, int color) {
-        SpannableStringBuilder sText = new SpannableStringBuilder(" ");
+        SpannableStringBuilder sText = new SpannableStringBuilder();
         /// Add '@' & '#' highlighting
         if (text != null && text.length() > 0) {
             sText.append(text);
@@ -180,7 +176,6 @@ public abstract class Tagger {
                 ForegroundColorSpan sColor = new ForegroundColorSpan(color);
                 sText.setSpan(sColor, start, end, MODE);
             }
-
             /// Add link highlighting
             Stack<Integer> stack = new Stack<>();
             Matcher lMatcher = LINK_PATTERN.matcher(sText.toString());
@@ -190,7 +185,7 @@ public abstract class Tagger {
             }
             while (!stack.empty()) {
                 int end = stack.pop();
-                int start = stack.pop() + 1;
+                int start = stack.pop() + 9;
                 if (start + MAX_LINK_LENGTH < end) {
                     sText.replace(start + MAX_LINK_LENGTH, end, "...");
                     end = start + MAX_LINK_LENGTH + 3;
@@ -199,7 +194,7 @@ public abstract class Tagger {
                 sText.setSpan(sColor, start, end, MODE);
             }
         }
-        return sText.delete(0, 1); // Remove first whitespace added at the beginning of this method
+        return sText;
     }
 
 

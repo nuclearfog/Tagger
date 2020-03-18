@@ -1,0 +1,5 @@
+/.gradle/
+/.idea/
+/build/intermediates/lint-cache/
+/StudioProjects-Tagger.iml
+/Tagger.iml
