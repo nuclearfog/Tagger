@@ -23,9 +23,9 @@ import java.util.regex.Pattern;
  */
 public abstract class Tagger {
 
-    private static final String LINK_PATTERN_STRING = "https://\\S+";
+    private static final String HTTP_PATTERN_STRING = "http://\\S+";
     private static final String TW_PATTERN_STRING = "[@#][^@#`*'~.,;:<>|^!/\"§%&()=?´°{}+\\-\\[\\]\\s]+";
-    private static final Pattern LINK_PATTERN = Pattern.compile(LINK_PATTERN_STRING);
+    private static final Pattern HTTP_PATTERN = Pattern.compile(HTTP_PATTERN_STRING);
     private static final Pattern TW_PATTERN = Pattern.compile(TW_PATTERN_STRING);
     private static final int MODE = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
     private static final int MAX_LINK_LENGTH = 30;
@@ -47,7 +47,7 @@ public abstract class Tagger {
             Matcher m = TW_PATTERN.matcher(sText);
             while (m.find()) {
                 int end = m.end();
-                int start = m.start() + 1;
+                int start = m.start();
                 final CharSequence tag = sText.subSequence(start, end);
                 sText.setSpan(new ClickableSpan() {
                     @Override
@@ -84,7 +84,7 @@ public abstract class Tagger {
             Matcher twMatcher = TW_PATTERN.matcher(sText);
             while (twMatcher.find()) {
                 int end = twMatcher.end();
-                int start = twMatcher.start() + 1;
+                int start = twMatcher.start();
                 final CharSequence twStr = sText.subSequence(start, end);
                 sText.setSpan(new ClickableSpan() {
                     @Override
@@ -101,15 +101,16 @@ public abstract class Tagger {
             }
             /// Add link highlight + listener
             Stack<Integer> stack = new Stack<>();
-            Matcher lMatcher = LINK_PATTERN.matcher(sText.toString());
+            Matcher lMatcher = HTTP_PATTERN.matcher(sText.toString());
             while (lMatcher.find()) {
                 stack.push(lMatcher.start());
                 stack.push(lMatcher.end());
             }
             while (!stack.empty()) {
                 int end = stack.pop();
-                int start = stack.pop() + 9;
-                final CharSequence link = sText.subSequence(start, end);
+                int start = stack.pop();
+                final String link = sText.subSequence(start, end).toString();
+                start += link.startsWith("https://") ? 8 : 7;
                 if (start + MAX_LINK_LENGTH < end) {
                     sText.replace(start + MAX_LINK_LENGTH, end, "...");
                     end = start + MAX_LINK_LENGTH + 3;
@@ -117,7 +118,7 @@ public abstract class Tagger {
                 sText.setSpan(new ClickableSpan() {
                     @Override
                     public void onClick(@NonNull View widget) {
-                        l.onLinkClick(link.toString());
+                        l.onLinkClick(link);
                     }
 
                     @Override
@@ -147,7 +148,7 @@ public abstract class Tagger {
             Matcher m = TW_PATTERN.matcher(sText.toString());
             while (m.find()) {
                 int end = m.end();
-                int start = m.start() + 1;
+                int start = m.start();
                 ForegroundColorSpan sColor = new ForegroundColorSpan(color);
                 sText.setSpan(sColor, start, end, MODE);
             }
@@ -172,20 +173,22 @@ public abstract class Tagger {
             Matcher twMatcher = TW_PATTERN.matcher(sText.toString());
             while (twMatcher.find()) {
                 int end = twMatcher.end();
-                int start = twMatcher.start() + 1;
+                int start = twMatcher.start();
                 ForegroundColorSpan sColor = new ForegroundColorSpan(color);
                 sText.setSpan(sColor, start, end, MODE);
             }
             /// Add link highlighting
             Stack<Integer> stack = new Stack<>();
-            Matcher lMatcher = LINK_PATTERN.matcher(sText.toString());
+            Matcher lMatcher = HTTP_PATTERN.matcher(sText.toString());
             while (lMatcher.find()) {
                 stack.push(lMatcher.start());
                 stack.push(lMatcher.end());
             }
             while (!stack.empty()) {
                 int end = stack.pop();
-                int start = stack.pop() + 9;
+                int start = stack.pop();
+                final String link = sText.subSequence(start, end).toString();
+                start += link.startsWith("https://") ? 8 : 7;
                 if (start + MAX_LINK_LENGTH < end) {
                     sText.replace(start + MAX_LINK_LENGTH, end, "...");
                     end = start + MAX_LINK_LENGTH + 3;
