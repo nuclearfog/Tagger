@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  * every word starting with '@', '#' or http(s) links will be highlighted
  *
  * @author nuclearfog
- * @version 2.1
+ * @version 2.2
  */
 public abstract class Tagger {
 
