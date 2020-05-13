@@ -30,7 +30,11 @@ textView1.setText(span);
 Spannable spanClick = Tagger.makeText(text, redColor, new Tagger.OnTagClickListener() {
                 @Override
                 public void onClick(String tag) {
-                    // handle on click
+                  // called if hashtag or username is clicked
+                }
+                
+                public void onLinkClick(String link) {
+                  // called if url link is clicked
                 }
             });
             
