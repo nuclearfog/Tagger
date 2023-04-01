@@ -1,14 +1,15 @@
 package org.nuclearfog.tag;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.util.Patterns;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -19,17 +20,27 @@ import java.util.regex.Pattern;
  * every word starting with '@', '#' or http(s) links will be highlighted
  *
  * @author nuclearfog
- * @version 2.2
+ * @version 2.4
  */
 public abstract class Tagger {
 
-    private static final String HTTP_PATTERN_STRING = "https?://\\S+";
-    private static final String TW_PATTERN_STRING = "[@#][^@#\"“”‘’«»„＂⹂‟`*'~.,;‚‛:<>|^!/§%&()=?´°{}+\\-\\[\\]\\s]+";
-    private static final Pattern HTTP_PATTERN = Pattern.compile(HTTP_PATTERN_STRING);
-    private static final Pattern TW_PATTERN = Pattern.compile(TW_PATTERN_STRING);
-    private static final int MODE = Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
-    private static final int MAX_LINK_LENGTH = 30;
+    /**
+     * regex patterns used to get @usernames and #hashtags
+     */
+    private static final Pattern[] PATTERNS = {
+            Pattern.compile("@[^#\"“”‘’«»„＂⹂‟`*'~,;‚‛:<>|^!/§%&()=?´°{}+\\-\\[\\]\\s]+"),
+            Pattern.compile("#[^@#\"“”‘’«»„＂⹂‟`*'~,;‚.‛:<>|^!/§%&()=?´°{}+\\-\\[\\]\\s]+")
+    };
 
+    /**
+     * default span type
+     */
+    private static final int SPAN_TYPE = Spannable.SPAN_EXCLUSIVE_EXCLUSIVE;
+
+    /**
+     * maximum link url length before truncating
+     */
+    private static final int MAX_LINK_LENGTH = 30;
 
     /**
      * Make a spannable colored String with click listener
@@ -40,32 +51,33 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeText(@Nullable String text, final int color, @NonNull final OnTagClickListener l) {
-        SpannableStringBuilder sText = new SpannableStringBuilder();
+        SpannableStringBuilder spannable = new SpannableStringBuilder();
         /// Add '@' & '#' highlighting + listener
         if (text != null && text.length() > 0) {
-            sText.append(text);
-            Matcher m = TW_PATTERN.matcher(sText);
-            while (m.find()) {
-                int end = m.end();
-                int start = m.start();
-                final CharSequence tag = sText.subSequence(start, end);
-                sText.setSpan(new ClickableSpan() {
-                    @Override
-                    public void onClick(@NonNull View widget) {
-                        l.onTagClick(tag.toString());
-                    }
+            spannable.append(text);
+            for (Pattern pattern : PATTERNS) {
+                Matcher m = pattern.matcher(spannable);
+                while (m.find()) {
+                    int end = m.end();
+                    int start = m.start();
+                    final String tag = spannable.subSequence(start, end).toString();
+                    spannable.setSpan(new ClickableSpan() {
+                        @Override
+                        public void onClick(@NonNull View widget) {
+                            l.onTagClick(tag);
+                        }
 
-                    @Override
-                    public void updateDrawState(@NonNull TextPaint ds) {
-                        ds.setColor(color);
-                        ds.setUnderlineText(false);
-                    }
-                }, start, end, MODE);
+                        @Override
+                        public void updateDrawState(@NonNull TextPaint ds) {
+                            ds.setColor(color);
+                            ds.setUnderlineText(false);
+                        }
+                    }, start, end, SPAN_TYPE);
+                }
             }
         }
-        return sText;
+        return spannable;
     }
-
 
     /**
      * Make a spannable colored String with click listener
@@ -77,51 +89,31 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeTextWithLinks(@Nullable String text, final int color, @NonNull final OnTagClickListener l) {
-        SpannableStringBuilder sText = new SpannableStringBuilder();
-        /// Add '@' & '#' highlighting + listener
-        if (text != null && text.length() > 0) {
-            sText.append(text);
-            Matcher twMatcher = TW_PATTERN.matcher(sText);
-            while (twMatcher.find()) {
-                int end = twMatcher.end();
-                int start = twMatcher.start();
-                final CharSequence twStr = sText.subSequence(start, end);
-                sText.setSpan(new ClickableSpan() {
-                    @Override
-                    public void onClick(@NonNull View widget) {
-                        l.onTagClick(twStr.toString());
-                    }
-
-                    @Override
-                    public void updateDrawState(@NonNull TextPaint ds) {
-                        ds.setColor(color);
-                        ds.setUnderlineText(false);
-                    }
-                }, start, end, MODE);
+        SpannableStringBuilder spannable = new SpannableStringBuilder(makeText(text, color, l));
+        // Add link highlight + listener
+        if (spannable.length() > 0) {
+            Stack<Integer> indexStack = new Stack<>();
+            Matcher m = Patterns.WEB_URL.matcher(spannable.toString());
+            while (m.find()) {
+                indexStack.push(m.start());
+                indexStack.push(m.end());
             }
-            /// Add link highlight + listener
-            Stack<Integer> stack = new Stack<>();
-            Matcher lMatcher = HTTP_PATTERN.matcher(sText.toString());
-            while (lMatcher.find()) {
-                stack.push(lMatcher.start());
-                stack.push(lMatcher.end());
-            }
-            while (!stack.empty()) {
-                int end = stack.pop();
-                int start = stack.pop();
-                final String link = sText.subSequence(start, end).toString();
+            while (!indexStack.empty()) {
+                int end = indexStack.pop();
+                int start = indexStack.pop();
+                final String link = spannable.subSequence(start, end).toString();
                 if (link.startsWith("https://")) {
-                    sText = sText.delete(start, start + 8);
+                    spannable = spannable.delete(start, start + 8);
                     end -= 8;
-                } else {
-                    sText = sText.delete(start, start + 7);
+                } else if (link.startsWith("http://")) {
+                    spannable = spannable.delete(start, start + 7);
                     end -= 7;
                 }
                 if (start + MAX_LINK_LENGTH < end) {
-                    sText.replace(start + MAX_LINK_LENGTH, end, "...");
+                    spannable.replace(start + MAX_LINK_LENGTH, end, "...");
                     end = start + MAX_LINK_LENGTH + 3;
                 }
-                sText.setSpan(new ClickableSpan() {
+                spannable.setSpan(new ClickableSpan() {
                     @Override
                     public void onClick(@NonNull View widget) {
                         l.onLinkClick(link);
@@ -132,12 +124,11 @@ public abstract class Tagger {
                         ds.setColor(color);
                         ds.setUnderlineText(false);
                     }
-                }, start, end, MODE);
+                }, start, end, SPAN_TYPE);
             }
         }
-        return sText;
+        return spannable;
     }
-
 
     /**
      * Make a spannable String without listener
@@ -147,21 +138,22 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeText(@Nullable String text, int color) {
-        SpannableStringBuilder sText = new SpannableStringBuilder();
-        /// Add '@' & '#' highlighting
+        SpannableStringBuilder spannable = new SpannableStringBuilder();
+        // Add '@' & '#' highlighting
         if (text != null && text.length() > 0) {
-            sText.append(text);
-            Matcher m = TW_PATTERN.matcher(sText.toString());
-            while (m.find()) {
-                int end = m.end();
-                int start = m.start();
-                ForegroundColorSpan sColor = new ForegroundColorSpan(color);
-                sText.setSpan(sColor, start, end, MODE);
+            spannable.append(text);
+            for (Pattern pattern : PATTERNS) {
+                Matcher m = pattern.matcher(spannable.toString());
+                while (m.find()) {
+                    int end = m.end();
+                    int start = m.start();
+                    ForegroundColorSpan colorSpan = new ForegroundColorSpan(color);
+                    spannable.setSpan(colorSpan, start, end, SPAN_TYPE);
+                }
             }
         }
-        return sText;
+        return spannable;
     }
-
 
     /**
      * Make a spannable String without listener
@@ -172,46 +164,36 @@ public abstract class Tagger {
      * @return Spannable String
      */
     public static Spannable makeTextWithLinks(@Nullable String text, int color) {
-        SpannableStringBuilder sText = new SpannableStringBuilder();
-        /// Add '@' & '#' highlighting
-        if (text != null && text.length() > 0) {
-            sText.append(text);
-            Matcher twMatcher = TW_PATTERN.matcher(sText.toString());
-            while (twMatcher.find()) {
-                int end = twMatcher.end();
-                int start = twMatcher.start();
-                ForegroundColorSpan sColor = new ForegroundColorSpan(color);
-                sText.setSpan(sColor, start, end, MODE);
+        SpannableStringBuilder spannable = new SpannableStringBuilder(makeText(text, color));
+        // Add link highlighting
+        if (spannable.length() > 0) {
+            Stack<Integer> indexStack = new Stack<>();
+            Matcher m = Patterns.WEB_URL.matcher(spannable.toString());
+            while (m.find()) {
+                indexStack.push(m.start());
+                indexStack.push(m.end());
             }
-            /// Add link highlighting
-            Stack<Integer> stack = new Stack<>();
-            Matcher lMatcher = HTTP_PATTERN.matcher(sText.toString());
-            while (lMatcher.find()) {
-                stack.push(lMatcher.start());
-                stack.push(lMatcher.end());
-            }
-            while (!stack.empty()) {
-                int end = stack.pop();
-                int start = stack.pop();
-                final String link = sText.subSequence(start, end).toString();
+            while (!indexStack.empty()) {
+                int end = indexStack.pop();
+                int start = indexStack.pop();
+                final String link = spannable.subSequence(start, end).toString();
                 if (link.startsWith("https://")) {
-                    sText = sText.delete(start, start + 8);
+                    spannable = spannable.delete(start, start + 8);
                     end -= 8;
-                } else {
-                    sText = sText.delete(start, start + 7);
+                } else if (link.startsWith("http://")) {
+                    spannable = spannable.delete(start, start + 7);
                     end -= 7;
                 }
                 if (start + MAX_LINK_LENGTH < end) {
-                    sText.replace(start + MAX_LINK_LENGTH, end, "...");
+                    spannable.replace(start + MAX_LINK_LENGTH, end, "...");
                     end = start + MAX_LINK_LENGTH + 3;
                 }
-                ForegroundColorSpan sColor = new ForegroundColorSpan(color);
-                sText.setSpan(sColor, start, end, MODE);
+                ForegroundColorSpan colorSpan = new ForegroundColorSpan(color);
+                spannable.setSpan(colorSpan, start, end, SPAN_TYPE);
             }
         }
-        return sText;
+        return spannable;
     }
-
 
     /**
      * Listener for clickable spans
