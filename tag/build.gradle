@@ -10,11 +10,6 @@ android {
     defaultConfig {
         minSdkVersion 8
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-    }
 }
 
 afterEvaluate {
@@ -23,7 +18,7 @@ afterEvaluate {
             release(MavenPublication) {
                 groupId 'com.github.nuclearfog'
                 artifactId 'Tagger'
-                version '2.4'
+                version '2.4.1'
             }
         }
     }

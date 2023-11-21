@@ -20,9 +20,8 @@ import java.util.regex.Pattern;
  * every word starting with '@', '#' or http(s) links will be highlighted
  *
  * @author nuclearfog
- * @version 2.4
  */
-public abstract class Tagger {
+public final class Tagger {
 
     /**
      * regex patterns used to get @usernames and #hashtags
